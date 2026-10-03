@@ -45,6 +45,7 @@ export class PlanView {
       this.map.addLayer({ id: 'route', type: 'line', source: 'route', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#ffb000', 'line-width': 5 } });
     });
     this.map.on('click', (e) => this.addWaypoint({ lat: e.lngLat.lat, lon: e.lngLat.lng }));
+    this.map.once('load', () => this.fromUrl());
 
     const sel = $<HTMLSelectElement>('sel-provider');
     PROVIDERS.forEach((p) => sel.add(new Option(p.label, p.id)));
@@ -58,6 +59,27 @@ export class PlanView {
 
   resize(): void {
     this.map.resize();
+  }
+
+  /** Prefill waypoints from `?from=lat,lon&via=lat,lon&to=lat,lon` (via may repeat) — shareable routes. */
+  private fromUrl(): void {
+    const q = new URLSearchParams(location.search);
+    const parse = (v: string | null): LatLon | null => {
+      const m = v?.match(/^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/);
+      if (!m) return null;
+      const p = { lat: Number(m[1]), lon: Number(m[2]) };
+      return Math.abs(p.lat) <= 90 && Math.abs(p.lon) <= 180 ? p : null;
+    };
+    const from = parse(q.get('from'));
+    const to = parse(q.get('to'));
+    if (!from || !to) return;
+    const via = q.getAll('via').map(parse).filter((p): p is LatLon => p !== null).slice(0, 8);
+    this.waypoints = [from, ...via, to];
+    this.redrawMarkers();
+    this.invalidate();
+    const b = new LngLatBounds();
+    this.waypoints.forEach((p) => b.extend([p.lon, p.lat]));
+    this.map.fitBounds(b, { padding: 60, duration: 0 });
   }
 
   private addWaypoint(p: LatLon, asStart = false): void {

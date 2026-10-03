@@ -25,7 +25,7 @@ export default defineConfig({
       },
       workbox: {
         // App shell only. Map tiles and routing need the network while planning.
-        globPatterns: ['**/*.{js,css,html,svg,png}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,trb}'],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
       },
     }),

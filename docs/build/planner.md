@@ -59,3 +59,12 @@ npm run dev:lan    # also on your LAN, for a phone on the same Wi-Fi (plain http
 npm test
 npm run build && npm run preview   # production build with the service worker
 ```
+
+## Live demo and recordings
+
+- **GitHub Pages:** <https://kabuldasa.github.io/tripper/> is deployed from `main` by `.github/workflows/pages.yml`.
+- **Deep links:**
+    - `#demo` opens the Pod tab with the bundled sample route (`planner/public/demo.trb`).
+    - `#pod` opens the Pod tab.
+    - `?from=lat,lon&to=lat,lon` (plus optional repeated `via=lat,lon`) pre-fills the Plan tab's waypoints.
+- **Re-recording the demo:** `npm run demo:record` builds the app, then drives your installed Google Chrome headlessly with `playwright-core`. It plans, builds and rides the sample route, then rewrites `public/demo.trb`, `docs/img/demo-app.gif` and `docs/img/demo-pod.gif` (the GIFs are encoded with `gifenc`). It needs network access for routing and tiles.

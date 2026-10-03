@@ -28,6 +28,8 @@
 | simplify-js | *Not used.* It can't force-keep maneuver vertices, so `planner/src/plan/simplify.ts` implements Douglas–Peucker with forced vertices | <https://github.com/mourner/simplify-js> |
 | vite-plugin-pwa `1.3.0` | Installable/offline PWA | <https://vite-pwa-org.netlify.app> |
 | Vite `8.3.2`, Vitest `5.0.3`, TypeScript `7.0.2` | Build, tests, types | <https://vite.dev> |
+| playwright-core `1.63.0` (dev) | Drives installed Chrome to record the demo (`npm run demo:record`) | <https://playwright.dev> |
+| gifenc `1.0.3` (dev) | Encodes the demo GIFs | <https://github.com/mattdesl/gifenc> |
 
 ## Tools
 

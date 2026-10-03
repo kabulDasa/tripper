@@ -74,6 +74,7 @@ export class PodView {
     };
     this.bootUntil = performance.now() + BOOT_MS;
     this.wireControls();
+    this.info('<b></b>', 'No route loaded. Try the demo route, load a .trb, or plan one in the Plan tab.');
     requestAnimationFrame(this.frame);
   }
 
@@ -83,7 +84,23 @@ export class PodView {
     else this.map.resize();
   }
 
+  /** Bundled sample ride (central Jakarta), so the pod can be tried without planning a route. */
+  async loadDemo(): Promise<void> {
+    try {
+      const res = await fetch(new URL('demo.trb', document.baseURI));
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      // Not remembered: the demo must never replace the user's own last route.
+      await this.loadBundle(new Uint8Array(await res.arrayBuffer()), 'demo.trb', false);
+    } catch (e) {
+      this.info(`<span class="err"></span>`, `Couldn't load the demo route: ${(e as Error).message}`);
+    }
+  }
+
+  /** Loads requested so far (valid or not) — lets the startup restore skip itself if the user already chose. */
+  loadsStarted = 0;
+
   async loadBundle(bytes: Uint8Array, filename: string, remember = true): Promise<void> {
+    this.loadsStarted++;
     if (bytes.length > MAX_BUNDLE_BYTES) {
       this.info(`<span class="err"></span>`, `File too large (${(bytes.length / 1048576).toFixed(1)} MB). Previous route kept.`);
       return;
@@ -282,6 +299,7 @@ export class PodView {
     });
     $('btn-brownout').addEventListener('click', () => this.brownout());
     $('btn-shot').addEventListener('click', () => this.screenshot());
+    $('btn-demo').addEventListener('click', () => void this.loadDemo());
 
     const speed = $<HTMLInputElement>('rng-speed');
     const noise = $<HTMLInputElement>('rng-noise');

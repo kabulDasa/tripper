@@ -1,0 +1,61 @@
+# Publishes the planner + pod emulator (planner/dist) to GitHub Pages as the live demo.
+# Runs only on main (the github-pages environment also restricts deploys to main).
+# Rollback: revert the change on main (re-triggers this workflow), or re-run an older
+# run's deploy job within a day (artifact retention). Take the site down:
+#   gh api -X DELETE repos/kabulDasa/tripper/pages
+name: Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'planner/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false # never cut a deploy off halfway
+
+jobs:
+  build:
+    name: Build planner
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: planner
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: planner/.nvmrc
+          # No npm cache: the artifact this job builds is published.
+      - run: npm ci --ignore-scripts
+      - run: npm test
+      - run: npm run build
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: planner/dist
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      pages: write    # publish the artifact
+      id-token: write # OIDC token deploy-pages uses to verify the deployment
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

@@ -25,4 +25,23 @@ function showTab(tab: Tab): void {
 
 document.querySelectorAll<HTMLButtonElement>('.tabs button').forEach((b) => b.addEventListener('click', () => showTab(b.dataset.tab as Tab)));
 
-void loadLast().then((last) => last && pod.loadBundle(last.bytes, last.filename, false));
+// Deep links: #pod opens the Pod tab, #demo opens it with the bundled demo route.
+function applyHash(): boolean {
+  if (location.hash === '#demo') {
+    showTab('pod');
+    void pod.loadDemo();
+    // Consume the hash so a later reload restores the user's own route, not the demo.
+    history.replaceState(null, '', location.pathname + location.search + '#pod');
+    return true;
+  }
+  if (location.hash === '#pod') showTab('pod');
+  return false;
+}
+window.addEventListener('hashchange', () => void applyHash());
+if (!applyHash()) {
+  const before = pod.loadsStarted;
+  void loadLast().then((last) => {
+    // Skip if the user (or a #demo hashchange) loaded something while IndexedDB was answering.
+    if (last && pod.loadsStarted === before) void pod.loadBundle(last.bytes, last.filename, false);
+  });
+}

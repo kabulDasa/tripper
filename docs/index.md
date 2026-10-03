@@ -11,6 +11,10 @@ flowchart LR
   B --> D[Round 240×240 display]
 ```
 
+<p align="center"><img src="img/demo-pod.gif" width="280" alt="Emulated pod display riding a route"></p>
+
+**[Try the live demo](https://kabuldasa.github.io/tripper/#demo)**: the route planner and an emulated pod, running in your browser.
+
 ## What it does
 
 - **Turn-by-turn without a phone link.** It shows an arrow, the distance and the street name for the next maneuver.
