@@ -84,7 +84,6 @@ export class PodView {
   }
 
   async loadBundle(bytes: Uint8Array, filename: string, remember = true): Promise<void> {
-    const gen = ++this.loadGen;
     if (bytes.length > MAX_BUNDLE_BYTES) {
       this.info(`<span class="err"></span>`, `File too large (${(bytes.length / 1048576).toFixed(1)} MB). Previous route kept.`);
       return;
@@ -97,6 +96,8 @@ export class PodView {
       this.info(`<span class="err"></span>`, msg);
       return;
     }
+    // Only a valid bundle supersedes an earlier load still decoding.
+    const gen = ++this.loadGen;
     const images = await Promise.all(
       b.images.map((img) => {
         const sz = jpegSize(img.jpeg);

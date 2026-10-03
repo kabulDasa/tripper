@@ -223,6 +223,9 @@ export class PlanView {
   private async doBuild(): Promise<void> {
     const route = this.route;
     if (!route || this.building) return;
+    // A route request still in flight would replace this.route mid-build.
+    this.abort?.abort();
+    this.abort = null;
     this.setBuilding(true);
     const btn = $<HTMLButtonElement>('btn-build');
     const prog = $<HTMLProgressElement>('build-progress');
@@ -255,6 +258,7 @@ export class PlanView {
           $('build-result').textContent = `Rendering snapshot ${done}/${total}…`;
         },
       });
+      if (this.route !== route) return; // route was replaced; this bundle is stale
       this.bytes = bytes;
       this.filename = `${bundle.manifest.id}.trb`;
       const secs = ((performance.now() - t0) / 1000).toFixed(1);
