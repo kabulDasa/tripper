@@ -10,12 +10,15 @@
     "preview": "vite preview",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "icons": "node scripts/make-icons.mjs"
+    "icons": "node scripts/make-icons.mjs",
+    "demo:record": "vite build && node scripts/record-demo.mjs"
   },
   "dependencies": {
     "maplibre-gl": "6.11.2"
   },
   "devDependencies": {
+    "gifenc": "1.0.3",
+    "playwright-core": "1.63.0",
     "typescript": "7.0.2",
     "vite": "8.3.2",
     "vite-plugin-pwa": "1.3.0",

@@ -58,7 +58,7 @@ The dates are illustrative. M2/M3/M6 are pure software and can run in parallel w
 
 **Accept:**
 
-- [ ] CI is green on the skeleton: navcore native tests, both firmware builds, planner tests and build, `mkdocs build --strict`, the navcore include-purity grep, and the firmware/planner config-sync check (`tools/check_config_sync.py`)
+- [x] CI is green on the skeleton: navcore native tests, both firmware builds, planner tests and build, `mkdocs build --strict`, the navcore include-purity grep, and the firmware/planner config-sync check (`tools/check_config_sync.py`)
 - [x] `mkdocs serve` shows these docs
 
 ### M1 — Hardware bring-up 🧑‍🔧 *(needs you)*
