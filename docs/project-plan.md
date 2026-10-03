@@ -122,6 +122,16 @@ Implement the [screen list](design/screens.md#screen-list) with LovyanGFX sprite
 - The junction screen holds ≥ 20 fps while the dot moves.
 - Heap and PSRAM stay stable over a 1-hour replay loop (no leaks).
 
+### M6a — Browser preview (planner + pod emulator) *(done early, before parts arrive)*
+
+A hardware-free slice of M2, M3, M5 and M6 in `planner/`: route → snapshots → `.trb` → emulated pod running a TypeScript port of `navcore`. See [planner § Pod preview](build/planner.md#pod-preview-no-hardware).
+
+**Accept:**
+
+- [x] `npm test` green: `.trb` round trip, validation rules, fuzzing, projection sanity, maneuver mapping, M2 matcher/phase/off-route/dead-reckoning cases, simulated rides at 20/50/90 km/h with GNSS noise
+- [x] Plan → build → preview works in the browser with the production build (service worker active)
+- [ ] Opened and installed on a real iPhone and Android phone 🧑‍🔧
+
 ### M6 — Planner PWA
 
 Build the [planner](build/planner.md): routing provider (OSRM first), maneuver mapping, MapLibre snapshot renderer, bundle writer, GPX import.
