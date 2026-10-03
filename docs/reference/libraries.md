@@ -18,14 +18,16 @@
 
 | Library / API | Use | Link |
 |---|---|---|
-| MapLibre GL JS | Map UI + snapshot rendering | <https://maplibre.org> |
+| MapLibre GL JS `6.11.2` | Map UI + snapshot rendering | <https://maplibre.org> |
 | OpenFreeMap | Free vector tiles | <https://openfreemap.org> |
-| OSRM | Routing (demo server for testing) | <https://project-osrm.org> |
+| Valhalla (FOSSGIS public server) | Default routing: `motorcycle` costing, tolls avoided | <https://valhalla.github.io/valhalla/> |
+| OSRM | Routing (demo server for testing, car profile only) | <https://project-osrm.org> |
 | GraphHopper / Valhalla | Routing alternatives | <https://www.graphhopper.com> · <https://valhalla.github.io/valhalla/> |
 | Mapbox Static Images API | Quick-start snapshots (`lon,lat,zoom,bearing`, Web Mercator) | <https://docs.mapbox.com/api/maps/static-images/> |
 | @mapbox/polyline | Polyline encode/decode | <https://github.com/mapbox/polyline> |
-| simplify-js | Douglas–Peucker simplification | <https://github.com/mourner/simplify-js> |
-| vite-plugin-pwa | Installable/offline PWA | <https://vite-pwa-org.netlify.app> |
+| simplify-js | *Not used.* It can't force-keep maneuver vertices, so `planner/src/plan/simplify.ts` implements Douglas–Peucker with forced vertices | <https://github.com/mourner/simplify-js> |
+| vite-plugin-pwa `1.3.0` | Installable/offline PWA | <https://vite-pwa-org.netlify.app> |
+| Vite `8.3.2`, Vitest `5.0.3`, TypeScript `7.0.2` | Build, tests, types | <https://vite.dev> |
 
 ## Tools
 
