@@ -1,0 +1,7 @@
+{
+  "name": "navcore",
+  "version": "0.0.0",
+  "description": "Pure C++17 navigation core: geo, bundle parser, matcher, triggers. No Arduino/ESP-IDF.",
+  "frameworks": "*",
+  "platforms": "*"
+}
