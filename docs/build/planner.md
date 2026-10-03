@@ -7,8 +7,9 @@ A static web app that works the same on iPhone and Android. It plans a route, re
 - **Vite + TypeScript**, no framework needed (or Svelte if you prefer).
 - **MapLibre GL JS** for the interactive planning map and for rendering snapshots.
 - Tiles: **OpenFreeMap** (free vector tiles, no API key) or a Mapbox/MapTiler key.
-- Routing (pluggable via a `RoutingProvider` interface):
-    - **OSRM** (`router.project-osrm.org` is a demo server. Fine for personal testing, but don't hammer it)
+- Routing (pluggable via a `RoutingProvider` interface). All providers return OSRM-format steps:
+    - **Valhalla** `motorcycle` costing with `use_tolls: 0` (default, public FOSSGIS server `valhalla1.openstreetmap.de`, light use only). Motorcycles are generally banned from Indonesian toll roads, so the router must avoid them
+    - **OSRM** (`router.project-osrm.org` is a demo server with a **car profile only**; it rejects every `exclude=` value, so it can't avoid tolls. Fine for personal testing, but don't hammer it)
     - **GraphHopper** or **Valhalla** (free tiers, motorcycle-ish profiles)
     - **GPX import** (from OsmAnd, Organic Maps or Komoot), with maneuvers derived from the geometry
 - `vite-plugin-pwa` so it installs and works offline for the *bundle-writing* parts.
@@ -39,3 +40,22 @@ A static web app that works the same on iPhone and Android. It plans a route, re
 - Round-trip: write a bundle → parse with a TS reader → identical.
 - **Golden file:** `tools/fixtures/demo.trb` must parse identically in the TS reader, the Python inspector and C++ `navcore` (native test). This is the contract between the phone and the device.
 - Maneuver mapping table: one test per OSRM `type`/`modifier` combination.
+
+## Pod preview (no hardware)
+
+The planner has a second tab, **Pod**, that emulates the device so the whole flow can be tested before buying parts:
+
+- Loads a `.trb` through the same validating reader the device uses. A corrupt file is rejected and the previous route stays loaded.
+- Runs a TypeScript port of `navcore` (`planner/src/navcore/`: matcher, trigger phases, off-route, heading hold, dead reckoning, persisted resume). It follows [algorithms](../design/algorithms.md) exactly, and its constants mirror `navcore/config.h`. Once the C++ `navcore` exists, compile it to WASM and drop the port, so the two can't drift.
+- Draws the [screens](../design/screens.md) on a 240×240 canvas: arrow, junction snapshot with the live dot, cruise, off-route, arrived, upload, boot, plus day/night themes and the A/B buttons (short and long press).
+- A simulated rider drives the route with adjustable speed, correlated GNSS noise, slowing for sharp turns, a **wrong turn**, a **tunnel** (no fixes) and a **brownout reset**. A timeline in the `tools/sim` format logs every phase change.
+- "Save screen PNG" exports the current screen for `docs/img/screens/`.
+
+```bash
+cd planner
+npm ci
+npm run dev        # http://localhost:5173
+npm run dev:lan    # also on your LAN, for a phone on the same Wi-Fi (plain http: no service worker or geolocation there)
+npm test
+npm run build && npm run preview   # production build with the service worker
+```

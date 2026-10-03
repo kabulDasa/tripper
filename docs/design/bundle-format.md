@@ -25,6 +25,8 @@ offset  size  field
 
 Image offsets are measured from the start of the file.
 
+**Alignment.** Writers pad the manifest with trailing ASCII spaces (still valid JSON) so that `28 + header_len` is a multiple of 4. Every binary section then starts 4-byte aligned. Readers must still use `memcpy` (or `DataView`) rather than casting pointers.
+
 !!! tip "Why int32 × 1e6"
     1e-6° is about 11 cm, which is far more precise than GNSS. It halves the size compared with doubles, and it lets the device keep everything as fixed-point until it needs local metric math.
 
@@ -34,10 +36,10 @@ Image offsets are measured from the start of the file.
 |---|---|---|
 | `point_index` | uint32 | Index into `points` where the maneuver happens |
 | `type` | uint8 | See the enum below |
-| `modifier` | int8 | Turn angle bucket, in −180..180 / 2 (so it fits in an int8) |
+| `modifier` | int8 | Signed turn angle ÷ 2 (−90..90), from bearing-before to bearing-after. Positive = right (clockwise) |
 | `exit_number` | uint8 | Roundabout exit, 0 if not applicable |
 | `image_index` | uint8 | 255 = no snapshot (so at most 255 snapshots per bundle) |
-| `name_offset` | uint32 | Byte offset into `manifest.strings` |
+| `name_offset` | uint32 | **UTF-8 byte** offset into the decoded `manifest.strings` (not UTF-16 code units) |
 | `name_len` | uint16 | |
 | `reserved` | 18 bytes | Zeroed. Room for lane hints later |
 
@@ -95,3 +97,8 @@ Reject the bundle and keep the previous route if any of these fail:
 3. Any section extends past the end of the file.
 4. `point_index` ≥ N, `image_index` ≥ K (except 255), or the string range is out of bounds.
 5. Maneuver `point_index` values aren't non-decreasing.
+6. Fewer than 2 points, `images_count` > 255, or the `has_snapshots` flag disagrees with `images_count`.
+7. An image range lies outside the image data or is empty, or its `zoom`/`bearing` isn't finite (zoom must be 0–24).
+8. The manifest isn't a UTF-8 JSON object with string `id` and `name`, a name isn't valid UTF-8, a point is outside ±90/±180, or a maneuver `type` is unknown.
+
+Compute all offset sums in 64-bit (or check for overflow) before comparing with the file size.

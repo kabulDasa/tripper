@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#111318" />
+    <meta name="description" content="Plan a route, build a .trb bundle and preview it on an emulated Tripper pod." />
+    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <title>Tripper Planner</title>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand"><span class="dot"></span>Tripper <small>planner · pod preview</small></div>
+      <nav class="tabs" role="tablist">
+        <button role="tab" data-tab="plan" aria-selected="true">Plan</button>
+        <button role="tab" data-tab="pod" aria-selected="false">Pod</button>
+      </nav>
+    </header>
+
+    <main>
+      <section id="tab-plan" class="tab plan" role="tabpanel">
+        <aside class="panel">
+          <div class="group">
+            <p class="hint" id="plan-hint">Tap the map to set the <b>start</b>, then the <b>destination</b>. More taps add stops before the destination. Drag markers to adjust.</p>
+            <div class="row">
+              <button id="btn-locate" class="ghost">Start at my location</button>
+              <button id="btn-clear" class="ghost">Clear</button>
+            </div>
+          </div>
+          <div class="group">
+            <label class="field">Routing
+              <select id="sel-provider"></select>
+            </label>
+            <button id="btn-route" class="primary" disabled>Get route</button>
+            <div id="route-summary" class="summary"></div>
+            <ul id="warnings" class="warnings"></ul>
+          </div>
+          <div class="group" id="maneuver-group" hidden>
+            <h3>Maneuvers <span id="maneuver-count" class="muted"></span></h3>
+            <ol id="maneuver-list" class="maneuvers"></ol>
+          </div>
+          <div class="group" id="build-group" hidden>
+            <label class="field">Route name
+              <input id="inp-name" type="text" maxlength="60" />
+            </label>
+            <button id="btn-build" class="primary">Build bundle (.trb)</button>
+            <progress id="build-progress" max="1" value="0" hidden></progress>
+            <div id="build-result" class="summary"></div>
+            <div class="row" id="build-actions" hidden>
+              <button id="btn-download" class="ghost">Download .trb</button>
+              <button id="btn-preview" class="primary">Preview on pod →</button>
+            </div>
+            <div id="thumbs" class="thumbs"></div>
+          </div>
+        </aside>
+        <div id="plan-map" class="map"></div>
+      </section>
+
+      <section id="tab-pod" class="tab pod" role="tabpanel" hidden>
+        <div class="pod-col">
+          <div class="bezel" id="bezel">
+            <canvas id="pod" width="240" height="240" aria-label="Emulated 240×240 round display"></canvas>
+          </div>
+          <div class="hw-buttons">
+            <button id="btn-a" class="hw" title="Short: cycle Arrow / Cruise / Snapshot preview. Long: upload mode (when stopped)">A</button>
+            <button id="btn-b" class="hw" title="Short: brightness step. Long: day/night theme">B</button>
+          </div>
+          <p class="muted tiny">Hold a button ≥ 0.7 s for a long press.</p>
+          <div class="row center">
+            <label class="ghost file-btn">Load .trb file<input id="inp-file" type="file" accept=".trb,application/octet-stream" hidden /></label>
+            <button id="btn-shot" class="ghost">Save screen PNG</button>
+          </div>
+          <div id="bundle-info" class="summary"></div>
+        </div>
+
+        <div class="sim-col">
+          <div class="group">
+            <h3>Ride simulator</h3>
+            <div class="row">
+              <button id="btn-play" class="primary" disabled>▶ Ride</button>
+              <button id="btn-restart" class="ghost" disabled>Restart</button>
+              <select id="sel-mult" title="Simulation speed">
+                <option value="1">1×</option>
+                <option value="2">2×</option>
+                <option value="5" selected>5×</option>
+                <option value="10">10×</option>
+                <option value="30">30×</option>
+              </select>
+            </div>
+            <label class="field">Speed <output id="out-speed">40 km/h</output>
+              <input id="rng-speed" type="range" min="5" max="100" step="5" value="40" />
+            </label>
+            <label class="field">GNSS error (1σ) <output id="out-noise">4 m</output>
+              <input id="rng-noise" type="range" min="0" max="25" step="1" value="4" />
+            </label>
+            <label class="check"><input id="chk-slow" type="checkbox" checked /> Slow down for sharp turns</label>
+            <div class="row">
+              <button id="btn-detour" class="ghost" disabled>Take a wrong turn</button>
+              <button id="btn-tunnel" class="ghost" disabled>Enter tunnel</button>
+              <button id="btn-brownout" class="ghost" disabled title="Simulate a reset while cranking: resume from persisted progress">Brownout reset</button>
+            </div>
+          </div>
+          <div class="group">
+            <h3>navcore state</h3>
+            <dl id="debug" class="debug"></dl>
+          </div>
+          <div id="pod-map" class="map small"></div>
+          <div class="group">
+            <h3>Timeline</h3>
+            <pre id="timeline" class="timeline"></pre>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
