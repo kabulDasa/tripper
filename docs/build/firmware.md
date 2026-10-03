@@ -5,45 +5,46 @@
 - **PlatformIO** (VS Code extension or `pip install platformio`), Arduino framework on ESP32-S3.
 - You can move to pure ESP-IDF later if needed. `navcore` stays portable either way.
 
-## `platformio.ini` (starting point)
+## `platformio.ini`
+
+The real file is `firmware/platformio.ini`. Its shape:
 
 ```ini
 [platformio]
 default_envs = waveshare128
 
-[env]
-platform = espressif32
+; ESP32-S3 boards only. The native env must NOT inherit this, or it picks up
+; framework = arduino and fails.
+[esp32s3]
+platform = platformio/espressif32@7.1.3
 framework = arduino
-monitor_speed = 115200
-build_flags = -std=gnu++17 -DCORE_DEBUG_LEVEL=3
-build_unflags = -std=gnu++11
-lib_deps =
-    lovyan03/LovyanGFX
-    bodmer/TJpg_Decoder
-    sparkfun/SparkFun u-blox GNSS v3
-    ricmoo/QRCode
-board_build.filesystem = littlefs
+board = esp32-s3-devkitc-1
+board_upload.flash_size = 16MB          ; the devkitc-1 default is 8 MB
 board_build.partitions = partitions_16mb.csv
+board_build.filesystem = littlefs
+build_unflags = -std=gnu++11
+build_flags = -std=gnu++17 -DCORE_DEBUG_LEVEL=3
 
 [env:waveshare128]
-board = esp32-s3-devkitc-1
+extends = esp32s3
 board_build.arduino.memory_type = qio_qspi   ; 2 MB quad PSRAM
-build_flags = ${env.build_flags} -DBOARD_WAVESHARE_128 -DBOARD_HAS_PSRAM
+build_flags = ${esp32s3.build_flags} -DBOARD_WAVESHARE_128 -DBOARD_HAS_PSRAM
 
 [env:devkit_n16r8]
-board = esp32-s3-devkitc-1
+extends = esp32s3
 board_build.arduino.memory_type = qio_opi    ; 8 MB octal PSRAM
-build_flags = ${env.build_flags} -DBOARD_DEVKIT_N16R8 -DBOARD_HAS_PSRAM
+build_flags = ${esp32s3.build_flags} -DBOARD_DEVKIT_N16R8 -DBOARD_HAS_PSRAM
 
 [env:native]
 platform = native
-build_flags = -std=c++17 -DNATIVE
 test_framework = unity
-lib_compat_mode = off
+build_flags = -std=c++17 -Wall -Wextra -Werror -DNATIVE
+lib_ignore = hal
 ```
 
-!!! note "Library names"
-    Library IDs and versions drift over time. Pin exact versions in `lib_deps` once the build works, and record them in `CLAUDE.md`.
+Libraries (LovyanGFX, TJpg_Decoder, SparkFun u-blox GNSS v3, QRCode) are added to `[esp32s3] lib_deps` in M1, when they are first used, **with pinned versions**. Record those versions in [libraries](../reference/libraries.md).
+
+Pins come only from `include/board_*.h`, selected by `include/board.h`. Both maps start with `BOARD_PINS_CONFIRMED 0`. The Waveshare map is all `-1` until its pinout has been checked against the wiki in M1.
 
 ## Partition table (`partitions_16mb.csv`)
 
@@ -96,7 +97,7 @@ That gives about 9.9 MB of LittleFS. Keep **two bundle slots** (`/routes/active.
 ```
 firmware/
   include/board_*.h          pin maps per board
-  lib/navcore/               geo.h, bundle.h, matcher.h, triggers.h, offroute.h, config.h
+  lib/navcore/src/navcore/  geo.h, bundle.h, matcher.h, triggers.h, offroute.h, config.h  (#include "navcore/...")
   lib/hal/                   gnss.*, display.*, storage.*, buttons.*, backlight.*
   src/main.cpp               task setup
   src/tasks/                 gnss_task, nav_task, ui_task, net_task

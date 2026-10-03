@@ -1,4 +1,4 @@
-// Tuning constants — mirror of firmware/lib/navcore/config.h (docs/design/algorithms.md).
+// Tuning constants — mirror of firmware/lib/navcore/src/navcore/config.h (docs/design/algorithms.md).
 // Keep the two in sync. Every value here is a field-tuning knob (M9).
 
 export const NAV = {

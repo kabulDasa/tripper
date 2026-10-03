@@ -1,0 +1,16 @@
+# Keeps SHA-pinned actions and exact-pinned dependencies from going stale.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }
+    groups:
+      actions: { patterns: ['*'] }
+  - package-ecosystem: npm
+    directory: /planner
+    schedule: { interval: weekly }
+    groups:
+      planner: { patterns: ['*'] }
+  - package-ecosystem: pip
+    directories: [/firmware, /docs]
+    schedule: { interval: weekly }
