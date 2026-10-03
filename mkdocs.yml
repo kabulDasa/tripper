@@ -1,0 +1,65 @@
+site_name: Tripper DIY
+site_description: Offline-first, Royal Enfield Tripper-style navigation pod on an ESP32-S3 and a 1.28" round GC9A01 display
+docs_dir: docs
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: amber
+      toggle:
+        icon: material/weather-night
+        name: Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: amber
+      toggle:
+        icon: material/weather-sunny
+        name: Light mode
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - search.highlight
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+nav:
+  - Home: index.md
+  - Project plan: project-plan.md
+  - Design:
+      - Architecture: design/architecture.md
+      - Route bundle format: design/bundle-format.md
+      - Navigation algorithms: design/algorithms.md
+      - Screens & UX: design/screens.md
+  - Build:
+      - Shopping list: build/shopping-list.md
+      - Hardware & wiring: build/hardware.md
+      - Power & mounting: build/power-and-mounting.md
+      - Firmware: build/firmware.md
+      - Route planner (PWA): build/planner.md
+      - Testing & field trials: build/testing.md
+  - Reference:
+      - Example projects: reference/examples.md
+      - Libraries & APIs: reference/libraries.md

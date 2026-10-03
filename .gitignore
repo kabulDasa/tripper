@@ -1,0 +1,10 @@
+site/
+.pio/
+node_modules/
+.env.local
+tools/sim/build/
+dist/
+dev-dist/
+.DS_Store
+*.zip
+CLAUDE.md
